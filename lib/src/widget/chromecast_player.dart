@@ -14,7 +14,10 @@ class ChromecastPlayer extends StatelessWidget {
           child: Container(),
         ),
         MaterialButton(
-          onPressed: () => CastUiUtil().stopSession(),
+          onPressed: () async {
+            await CastUiUtil().stopSession();
+            Navigator.of(context, rootNavigator: true).pop();
+          },
           child: const Text('STOP SESSION'),
         ),
       ],

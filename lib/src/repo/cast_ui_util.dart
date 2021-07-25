@@ -9,6 +9,7 @@ class CastUiUtil {
   static CastUiUtil? _instance;
 
   late String _appId;
+  String? _appSessionId;
   late BehaviorSubject<CastSession?> _behaviorSubject;
   StreamSubscription<CastSessionState?>? _castSessionStateStream;
   StreamSubscription<Map<String, dynamic>?>? _messageStream;
@@ -19,7 +20,7 @@ class CastUiUtil {
 
   Future<void> init(String appId) async {
     _appId = appId;
-    _behaviorSubject = BehaviorSubject<CastSession?>();
+    _behaviorSubject = BehaviorSubject<CastSession?>.seeded(null);
   }
 
   Stream<CastSession?> get activeSession => _behaviorSubject.stream;
@@ -37,7 +38,6 @@ class CastUiUtil {
     final session = await CastSessionManager().startSession(device);
     await _castSessionStateStream?.cancel();
     _castSessionStateStream = session.stateStream.listen((state) {
-      print(state);
       if (state == CastSessionState.connected) {
         if (completer.isCompleted) return;
         _behaviorSubject.add(session);
@@ -46,12 +46,27 @@ class CastUiUtil {
         print('CONNECTING');
       } else if (state == CastSessionState.closed) {
         _behaviorSubject.add(null);
+        _appSessionId = null;
       }
     });
 
     await _messageStream?.cancel();
     _messageStream = session.messageStream.listen((message) {
       print('receive message: $message');
+      if (message.containsKey('type') && message['type'] == 'RECEIVER_STATUS') {
+        if (message.containsKey('status') && message['status'] is Map<String, dynamic>) {
+          final status = message['status'] as Map<String, dynamic>;
+          if (status.containsKey('applications') && status['applications'] is List<dynamic>) {
+            final applications = status['applications'] as List<dynamic>;
+            for (final application in applications) {
+              if (application is Map<String, dynamic> && application.containsKey('appId') && application['appId'] == _appId) {
+                _appSessionId =application['sessionId'];
+                print('Found a new sessionId: ${_appSessionId}');
+              }
+            }
+          }
+        }
+      }
     });
 
     session.sendMessage(CastSession.kNamespaceReceiver, {
@@ -82,7 +97,7 @@ class CastUiUtil {
           {
             'url': posterUrl,
           }
-        ]
+        ],
       },
     };
 
@@ -97,14 +112,14 @@ class CastUiUtil {
   Future<void> stopSession() async {
     final session = await activeSession.first;
     if (session == null) return;
-    final sessionId = session.sessionId;
-    session.sendMessage(CastSession.kNamespaceMedia, {
+    session.sendMessage(CastSession.kNamespaceReceiver, {
       'type': 'STOP',
-      'sessionId': sessionId,
+      'sessionId': _appSessionId,
     });
-    await CastSessionManager().endSession(sessionId);
+    await CastSessionManager().endSession(session.sessionId);
     await _castSessionStateStream?.cancel();
     await _messageStream?.cancel();
     _behaviorSubject.add(null);
+    _appSessionId = null;
   }
 }

@@ -31,7 +31,6 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
   Future<void> init(ChromecastDeviceListNavigator navigator) async {
     _navigator = navigator;
     await _setupStreams();
-    await _getData();
   }
 
   @override
@@ -46,6 +45,9 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
       if (disposed) return;
       _activeSession = session;
       notifyListeners();
+      if (_activeSession == null) {
+        _getData();
+      }
     });
   }
 
