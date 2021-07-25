@@ -17,6 +17,7 @@ class ChromecastDeviceListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return InkWell(
+      onTap: onClick,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
