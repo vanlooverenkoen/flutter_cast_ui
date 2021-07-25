@@ -54,29 +54,41 @@ class _MyHomePageState extends State<MyHomePage> {
           return ListView(
             children: [
               VideoListItem(
-                onClick: () => onClickVideo(
+                onClick: (data) => onClickVideo(
+                  data: data,
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                data: VideoListItemData(
+                  posterUrl:
+                      'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+                  title: 'Big Buck Bunny',
                   url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-                  hasActiveCastConnection: hasActiveCastConnection,
                 ),
-                imageUrl:
-                    'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
               VideoListItem(
-                onClick: () => onClickVideo(
+                onClick: (data) => onClickVideo(
+                  data: data,
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                data: VideoListItemData(
+                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
+                  title: 'Hot Air Balloons',
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
-                  hasActiveCastConnection: hasActiveCastConnection,
                 ),
-                imageUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
               VideoListItem(
-                onClick: () => onClickVideo(
+                onClick: (data) => onClickVideo(
+                  data: data,
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                data: VideoListItemData(
+                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
+                  title: 'City',
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
                   subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.srt',
-                  hasActiveCastConnection: hasActiveCastConnection,
                 ),
-                imageUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
             ],
@@ -87,26 +99,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void onClickVideo({
-    required String url,
+    required VideoListItemData data,
     required bool hasActiveCastConnection,
-    String? subtitleUrl,
   }) {
     if (hasActiveCastConnection) {
-      print('Implement the cast implementation. And show the player');
+      CastUiUtil().startPlayingStream(
+        url: data.url,
+        title: data.title,
+        posterUrl: data.posterUrl,
+        subtitleUrl: data.subtitleUrl,
+      );
     } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url, subtitleUrl: subtitleUrl)));
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: data.url, subtitleUrl: data.subtitleUrl)));
     }
   }
 }
 
 class VideoListItem extends StatelessWidget {
-  final VoidCallback onClick;
-  final String imageUrl;
+  final ValueChanged<VideoListItemData> onClick;
+  final VideoListItemData data;
   final bool hasActiveCastConnection;
 
   const VideoListItem({
     required this.onClick,
-    required this.imageUrl,
+    required this.data,
     required this.hasActiveCastConnection,
     Key? key,
   }) : super(key: key);
@@ -115,10 +131,10 @@ class VideoListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.network(imageUrl),
+        Image.network(data.posterUrl),
         Positioned.fill(
           child: GestureDetector(
-            onTap: onClick,
+            onTap: () => onClick(data),
             child: Container(
               color: Colors.transparent,
               alignment: Alignment.center,
@@ -133,6 +149,20 @@ class VideoListItem extends StatelessWidget {
       ],
     );
   }
+}
+
+class VideoListItemData {
+  final String title;
+  final String posterUrl;
+  final String url;
+  final String? subtitleUrl;
+
+  VideoListItemData({
+    required this.title,
+    required this.posterUrl,
+    required this.url,
+    this.subtitleUrl,
+  });
 }
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -195,10 +225,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       PlayerUpdater(
                         builder: (context) => ClosedCaption(
                           text: _controller.value.caption.text,
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white
-                          ),
+                          textStyle: const TextStyle(fontSize: 14, color: Colors.white),
                         ),
                       ),
                     ],

@@ -61,6 +61,39 @@ class CastUiUtil {
     return completer.future;
   }
 
+  Future<void> startPlayingStream({
+    required String url,
+    required String title,
+    required String posterUrl,
+    double currentTime = 0,
+    String? subtitleUrl,
+  }) async {
+    final session = await activeSession.first;
+    if (session == null) return;
+    final message = {
+      'contentId': url,
+      'contentType': 'video/mp4',
+      'streamType': 'BUFFERED',
+      'metadata': {
+        'type': 0,
+        'metadataType': 0,
+        'title': title,
+        'images': [
+          {
+            'url': posterUrl,
+          }
+        ]
+      },
+    };
+
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'LOAD',
+      'autoPlay': true,
+      'currentTime': currentTime,
+      'media': message,
+    });
+  }
+
   Future<void> stopSession() async {
     final session = await activeSession.first;
     if (session == null) return;
