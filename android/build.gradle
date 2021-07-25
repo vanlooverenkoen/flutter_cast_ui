@@ -1,4 +1,4 @@
-group 'be.vanlooveren.cast.ui.flutter_cast_ui'
+group 'be.vanlooverenkoen.cast.ui.cast_ui'
 version '1.0-SNAPSHOT'
 
 buildscript {

@@ -1,4 +1,4 @@
-package be.vanlooveren.cast.ui.flutter_cast_ui
+package be.vanlooverenkoen.cast.ui.cast_ui
 
 import androidx.annotation.NonNull
 
@@ -8,7 +8,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
-/** FlutterCastUiPlugin */
+/** CastUiPlugin */
 class CastUiPlugin: FlutterPlugin, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///

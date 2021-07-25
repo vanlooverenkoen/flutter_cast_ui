@@ -3,12 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cast_ui/cast_ui.dart';
 
 void main() {
-  const channel = MethodChannel('cast_ui');
+  const MethodChannel channel = MethodChannel('cast_ui');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    channel.setMockMethodCallHandler((methodCall) async {
+    channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return '42';
     });
   });

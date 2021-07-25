@@ -1,5 +1,5 @@
 name: cast_ui_example
-description: Demonstrates how to use the flutter_cast_ui plugin.
+description: Demonstrates how to use the cast_ui plugin.
 publish_to: 'none'
 
 environment:

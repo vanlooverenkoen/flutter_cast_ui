@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="be.vanlooveren.cast.ui.flutter_cast_ui_example">
+    package="be.vanlooverenkoen.cast.ui.cast_ui_example">
    <application
-        android:label="flutter_cast_ui_example"
+        android:label="cast_ui_example"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

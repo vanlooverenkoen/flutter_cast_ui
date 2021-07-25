@@ -1,10 +1,10 @@
 import Flutter
 import UIKit
 
-public class SwiftFlutterCastUiPlugin: NSObject, FlutterPlugin {
+public class SwiftCastUiPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "cast_ui", binaryMessenger: registrar.messenger())
-    let instance = SwiftFlutterCastUiPlugin()
+    let instance = SwiftCastUiPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 

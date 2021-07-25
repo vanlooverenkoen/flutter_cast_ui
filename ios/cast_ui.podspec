@@ -1,13 +1,13 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint flutter_cast_ui.podspec` to validate before publishing.
+# Run `pod lib lint cast_ui.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
   s.name             = 'cast_ui'
   s.version          = '0.0.1'
   s.summary          = 'A plugin that simplifies the cast plugin by providing a basic U'
   s.description      = <<-DESC
-A new Flutter project.
+A plugin that simplifies the cast plugin by providing a basic U
                        DESC
   s.homepage         = 'https://vanlooverenkoen.be'
   s.license          = { :file => '../LICENSE' }

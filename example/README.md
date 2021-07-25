@@ -1,6 +1,6 @@
-# flutter_cast_ui_example
+# cast_ui_example
 
-Demonstrates how to use the flutter_cast_ui plugin.
+Demonstrates how to use the cast_ui plugin.
 
 ## Getting Started
 
