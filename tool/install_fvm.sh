@@ -1,6 +1,6 @@
 #!/bin/bash
 
-regex='"flutterSdkVersion": "(.*)"'
+regex='"flutterSdkVersion": "(.*)",'
 version=""
 
 fvmFlutterConfig=`cat .fvm/fvm_config.json`
