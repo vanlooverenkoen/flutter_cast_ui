@@ -28,8 +28,8 @@ class _ChromecastUiButtonState extends State<ChromecastUiButton> implements Chro
         icon: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: Icon(
-            viewModel.isConnected ? Icons.cast_connected_rounded : Icons.cast_rounded,
-            key: ValueKey(viewModel.isConnected),
+            viewModel.hasActiveSession ? Icons.cast_connected_rounded : Icons.cast_rounded,
+            key: ValueKey(viewModel.hasActiveSession),
           ),
         ),
       ),

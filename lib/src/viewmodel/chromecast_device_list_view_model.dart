@@ -1,16 +1,22 @@
-import 'package:cast/cast.dart';
+import 'dart:async';
+
+import 'package:cast/device.dart';
+import 'package:cast/session.dart';
+import 'package:cast_ui/cast_ui.dart';
 import 'package:cast_ui/src/util/dispose_mixin.dart';
 import 'package:flutter/widgets.dart';
 
 class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
   late final ChromecastDeviceListNavigator _navigator;
 
-  var _isConnected = false;
+  CastSession? _activeSession;
   var _isLoading = false;
   var _hasError = false;
   final _data = <CastDevice>[];
 
-  bool get isConnected => _isConnected;
+  StreamSubscription<CastSession?>? _activeSessionSubscription;
+
+  bool get isConnected => _activeSession != null;
 
   bool get isLoading => _isLoading;
 
@@ -24,7 +30,23 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
 
   Future<void> init(ChromecastDeviceListNavigator navigator) async {
     _navigator = navigator;
+    await _setupStreams();
     await _getData();
+  }
+
+  @override
+  void dispose() {
+    _activeSessionSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _setupStreams() async {
+    await _activeSessionSubscription?.cancel();
+    _activeSessionSubscription = CastUiUtil().activeSession.listen((session) {
+      if (disposed) return;
+      _activeSession = session;
+      notifyListeners();
+    });
   }
 
   Future<void> _getData() async {
@@ -32,7 +54,7 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
     _hasError = false;
     notifyListeners();
     try {
-      final result = await CastDiscoveryService().search();
+      final result = await CastUiUtil().getCastDevices();
       _data
         ..clear()
         ..addAll(result);
@@ -54,23 +76,9 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
   Future<void> _connectToYourApp(CastDevice device) async {
     _isLoading = true;
     notifyListeners();
-    final session = await CastSessionManager().startSession(device);
-    session.stateStream.listen((state) {
-      if (state == CastSessionState.connected) {
-        _isConnected = true;
-        _isLoading = false;
-        notifyListeners();
-      }
-    });
-
-    session.messageStream.listen((message) {
-      print('receive message: $message');
-    });
-
-    session.sendMessage(CastSession.kNamespaceReceiver, {
-      'type': 'LAUNCH',
-      'appId': 'B6DF242C', // set the appId of your app here
-    });
+    await CastUiUtil().startSession(device);
+    _isLoading = false;
+    notifyListeners();
   }
 }
 

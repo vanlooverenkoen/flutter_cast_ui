@@ -1,6 +1,5 @@
 import 'package:cast_ui/cast_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:cast/cast.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
@@ -27,6 +26,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  @override
+  void initState() {
+    super.initState();
+    CastUiUtil().init('B6DF242C');
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +75,27 @@ class _MyHomePageState extends State<MyHomePage> {
               Positioned.fill(
                 child: GestureDetector(
                   onTap: () => onClickVideo('https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4'),
+                  child: Container(
+                    color: Colors.transparent,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.play_arrow,
+                      size: 64,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Stack(
+            children: [
+              Image.network(
+                'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
+              ),
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => onClickVideo('https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4'),
                   child: Container(
                     color: Colors.transparent,
                     alignment: Alignment.center,
