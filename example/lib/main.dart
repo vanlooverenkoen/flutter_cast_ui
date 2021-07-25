@@ -1,5 +1,7 @@
+import 'package:cast_ui/cast_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:cast/cast.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,15 +16,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          brightness: Brightness.dark,
-          title: const Text(
-            'Cast UI Demo',
-          ),
-        ),
-        body: MyHomePage(),
-      ),
+      home: MyHomePage(),
     );
   }
 }
@@ -33,160 +27,130 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List<CastDevice>>? _future;
-  CastSession? session;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        brightness: Brightness.dark,
+        title: const Text(
+          'Cast UI Demo',
+        ),
+        actions: const [
+          ChromecastUiButton(),
+        ],
+      ),
+      body: ListView(
+        children: [
+          Stack(
+            children: [
+              Image.network(
+                'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+              ),
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => onClickVideo('http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4'),
+                  child: Container(
+                    color: Colors.transparent,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.play_arrow,
+                      size: 64,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Stack(
+            children: [
+              Image.network(
+                'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
+              ),
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => onClickVideo('https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4'),
+                  child: Container(
+                    color: Colors.transparent,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.play_arrow,
+                      size: 64,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onClickVideo(String url) {
+    const isConnected = false;
+    if (isConnected) {
+      print('Implement the cast implementation. And show the player');
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url)));
+    }
+  }
+}
+
+class VideoPlayerScreen extends StatefulWidget {
+  final String url;
+
+  const VideoPlayerScreen({
+    required this.url,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
+}
+
+class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+  late VideoPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _startSearch();
+    _controller = VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        _controller.play();
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<CastDevice>>(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              'Error: ${snapshot.error.toString()}',
-            ),
-          );
-        } else if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (snapshot.data!.isEmpty) {
-          return const Center(
-            child: Text(
-              'No Chromecast founded',
-            ),
-          );
-        }
-
-        final realData = snapshot.data?.where((element) => true).toList() ?? [];
-        return Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: realData.length,
-                itemBuilder: (context, index) {
-                  final device = realData[index];
-                  return ListTile(
-                    title: Text(device.name),
-                    onTap: () {
-                      // _connectToYourApp(context, device);
-                      _connectAndPlayMedia(context, device);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: _controller.value.isInitialized
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              )
+            : Container(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _controller.value.isPlaying ? _controller.pause() : _controller.play();
+          });
+        },
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+        ),
+      ),
     );
-  }
-
-  void _startSearch() {
-    _future = CastDiscoveryService().search();
-  }
-
-  // ignore: unused_element
-  Future<void> _connectToYourApp(BuildContext context, CastDevice object) async {
-    final session = await CastSessionManager().startSession(object);
-    setState(() {
-      this.session = session;
-    });
-    session.stateStream.listen((state) {
-      if (state == CastSessionState.connected) {
-        const snackBar = SnackBar(content: Text('Connected'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-        _sendMessageToYourApp(session);
-      }
-    });
-
-    session.messageStream.listen((message) {
-      print('receive message: $message');
-    });
-
-    session.sendMessage(CastSession.kNamespaceReceiver, {
-      'type': 'LAUNCH',
-      'appId': 'B6DF242C', // set the appId of your app here
-    });
-  }
-
-  void _sendMessageToYourApp(CastSession session) {
-    print('_sendMessageToYourApp');
-
-    session.sendMessage('urn:x-cast:namespace-of-the-app', {
-      'type': 'sample',
-    });
-  }
-
-  Future<void> _connectAndPlayMedia(BuildContext context, CastDevice object) async {
-    final session = await CastSessionManager().startSession(object);
-    setState(() {
-      this.session = session;
-    });
-    session.stateStream.listen((state) {
-      if (state == CastSessionState.connected) {
-        const snackBar = SnackBar(content: Text('Connected'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
-    });
-
-    var index = 0;
-
-    session.messageStream.listen((message) {
-      index += 1;
-
-      print('receive message: $message');
-
-      if (index == 2) {
-        Future.delayed(const Duration(seconds: 5)).then((x) {
-          _sendMessagePlayVideo(session);
-        });
-      }
-    });
-
-    session.sendMessage(CastSession.kNamespaceReceiver, {
-      'type': 'LAUNCH',
-      'appId': 'B6DF242C', // set the appId of your app here
-    });
-  }
-
-  void _sendMessagePlayVideo(CastSession session) {
-    print('_sendMessagePlayVideo');
-
-    final message = {
-      // Here you can plug an URL to any mp4, webm, mp3 or jpg file with the proper contentType.
-      'contentId': 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-      'contentType': 'video/mp4',
-      'streamType': 'BUFFERED', // or LIVE
-
-      // Title and cover displayed while buffering
-      'metadata': {
-        'type': 0,
-        'metadataType': 0,
-        'title': 'Big Buck Bunny',
-        'images': [
-          {
-            'url': 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
-          }
-        ]
-      }
-    };
-
-    session.sendMessage(CastSession.kNamespaceMedia, {
-      'type': 'LOAD',
-      'autoPlay': true,
-      'currentTime': 0,
-      'media': message,
-    });
   }
 }
