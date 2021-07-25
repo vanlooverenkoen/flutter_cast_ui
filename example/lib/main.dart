@@ -60,9 +60,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 data: VideoListItemData(
                   posterUrl:
-                      'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+                      'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/big-buck-bunny.jpeg',
                   title: 'Big Buck Bunny',
-                  url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+                  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
