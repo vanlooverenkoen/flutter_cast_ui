@@ -10,6 +10,7 @@ dependencies:
     path: ../
   flutter:
     sdk: flutter
+  http: ^0.13.3
   video_player: ^2.1.12
 
 dev_dependencies:

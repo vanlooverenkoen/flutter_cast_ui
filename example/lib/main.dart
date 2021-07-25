@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cast_ui/cast_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
 void main() {
@@ -55,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
-                imageUrl: 'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+                imageUrl:
+                    'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
               VideoListItem(
@@ -69,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
               VideoListItem(
                 onClick: () => onClickVideo(
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
+                  subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.srt',
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
                 imageUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
@@ -81,11 +86,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void onClickVideo({required String url, required bool hasActiveCastConnection}) {
+  void onClickVideo({
+    required String url,
+    required bool hasActiveCastConnection,
+    String? subtitleUrl,
+  }) {
     if (hasActiveCastConnection) {
       print('Implement the cast implementation. And show the player');
     } else {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url)));
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url, subtitleUrl: subtitleUrl)));
     }
   }
 }
@@ -128,9 +137,11 @@ class VideoListItem extends StatelessWidget {
 
 class VideoPlayerScreen extends StatefulWidget {
   final String url;
+  final String? subtitleUrl;
 
   const VideoPlayerScreen({
     required this.url,
+    this.subtitleUrl,
     Key? key,
   }) : super(key: key);
 
@@ -144,11 +155,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.url)
+    _controller = VideoPlayerController.network(widget.url, closedCaptionFile: _getClosedCaptionFile(widget.subtitleUrl))
       ..initialize().then((_) {
         _controller.play();
         setState(() {});
       });
+  }
+
+  Future<ClosedCaptionFile> _getClosedCaptionFile(String? subtitleUrl) async {
+    if (subtitleUrl == null) return SubRipCaptionFile('');
+    try {
+      final data = await http.get(Uri.parse(subtitleUrl));
+      final srtContent = data.body.toString();
+      return SubRipCaptionFile(srtContent);
+    } catch (e, stack) {
+      print('Failed to get subtitles for $subtitleUrl\n$e\n$stack');
+      return SubRipCaptionFile('');
+    }
   }
 
   @override
@@ -165,7 +188,22 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: _controller.value.isInitialized
             ? AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
+                child: Stack(
+                  children: [
+                    VideoPlayer(_controller),
+                    if (widget.subtitleUrl != null) ...[
+                      PlayerUpdater(
+                        builder: (context) => ClosedCaption(
+                          text: _controller.value.caption.text,
+                          textStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               )
             : Container(),
       ),
@@ -180,5 +218,37 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ),
       ),
     );
+  }
+}
+
+class PlayerUpdater extends StatefulWidget {
+  final WidgetBuilder builder;
+
+  const PlayerUpdater({
+    required this.builder,
+  });
+
+  @override
+  _PlayerUpdaterState createState() => _PlayerUpdaterState();
+}
+
+class _PlayerUpdaterState extends State<PlayerUpdater> {
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context);
   }
 }
