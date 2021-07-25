@@ -7,20 +7,44 @@ class ChromecastPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Player'),
-        Expanded(
-          child: Container(),
-        ),
-        MaterialButton(
-          onPressed: () async {
-            await CastUiUtil().stopSession();
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-          child: const Text('STOP SESSION'),
-        ),
-      ],
+    return StreamBuilder<bool>(
+      stream: CastUiUtil().hasActiveMediaSessionStream,
+      builder: (context, data) {
+        final hasActiveMediaSession = data.data ?? false;
+        return Column(
+          children: [
+            const Text('Player'),
+            if (hasActiveMediaSession) ...[
+              MaterialButton(
+                onPressed: () async {
+                  await CastUiUtil().pauseStream();
+                },
+                child: const Text('PAUSE SESSION'),
+              ),
+              MaterialButton(
+                onPressed: () async {
+                  await CastUiUtil().resumeStream();
+                },
+                child: const Text('RESUME STREAM'),
+              ),
+              MaterialButton(
+                onPressed: () async {
+                  await CastUiUtil().stopStream();
+                },
+                child: const Text('STOP SESSION'),
+              ),
+            ],
+            const SizedBox(height: 24),
+            MaterialButton(
+              onPressed: () async {
+                await CastUiUtil().stopSession();
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              child: const Text('STOP SESSION'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

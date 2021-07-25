@@ -41,7 +41,7 @@ class ChromecastDeviceListViewModel extends ChangeNotifier with DisposeMixin {
 
   Future<void> _setupStreams() async {
     await _activeSessionSubscription?.cancel();
-    _activeSessionSubscription = CastUiUtil().activeSession.listen((session) {
+    _activeSessionSubscription = CastUiUtil().activeSessionStream.listen((session) {
       if (disposed) return;
       _activeSession = session;
       notifyListeners();

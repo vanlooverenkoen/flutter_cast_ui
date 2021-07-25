@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: StreamBuilder<bool>(
-        stream: CastUiUtil().hasActiveSession,
+        stream: CastUiUtil().hasActiveSessionStream,
         builder: (context, snapshot) {
           final hasActiveCastConnection = snapshot.data ?? false;
           return ListView(

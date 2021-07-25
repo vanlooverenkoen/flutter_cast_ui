@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cast/cast.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,9 +11,16 @@ class CastUiUtil {
 
   late String _appId;
   String? _appSessionId;
-  late BehaviorSubject<CastSession?> _behaviorSubject;
+  late BehaviorSubject<CastSession?> _activeSessionBS;
+  late BehaviorSubject<int?> _activeMediaSessionIdBS;
   StreamSubscription<CastSessionState?>? _castSessionStateStream;
   StreamSubscription<Map<String, dynamic>?>? _messageStream;
+
+  Stream<CastSession?> get activeSessionStream => _activeSessionBS.stream;
+
+  Stream<bool> get hasActiveMediaSessionStream => _activeMediaSessionIdBS.stream.map((event) => event != null);
+
+  Stream<bool> get hasActiveSessionStream => activeSessionStream.map((event) => event != null);
 
   CastUiUtil._();
 
@@ -20,12 +28,9 @@ class CastUiUtil {
 
   Future<void> init(String appId) async {
     _appId = appId;
-    _behaviorSubject = BehaviorSubject<CastSession?>.seeded(null);
+    _activeSessionBS = BehaviorSubject<CastSession?>.seeded(null);
+    _activeMediaSessionIdBS = BehaviorSubject<int?>.seeded(null);
   }
-
-  Stream<CastSession?> get activeSession => _behaviorSubject.stream;
-
-  Stream<bool> get hasActiveSession => activeSession.map((event) => event != null);
 
   Future<List<CastDevice>> getCastDevices({Duration timeout = const Duration(seconds: 5)}) async {
     final result = await CastDiscoveryService().search(timeout: timeout);
@@ -40,12 +45,12 @@ class CastUiUtil {
     _castSessionStateStream = session.stateStream.listen((state) {
       if (state == CastSessionState.connected) {
         if (completer.isCompleted) return;
-        _behaviorSubject.add(session);
+        _activeSessionBS.add(session);
         completer.complete(session);
       } else if (state == CastSessionState.connecting) {
         print('CONNECTING');
       } else if (state == CastSessionState.closed) {
-        _behaviorSubject.add(null);
+        _activeSessionBS.add(null);
         _appSessionId = null;
       }
     });
@@ -53,18 +58,33 @@ class CastUiUtil {
     await _messageStream?.cancel();
     _messageStream = session.messageStream.listen((message) {
       print('receive message: $message');
-      if (message.containsKey('type') && message['type'] == 'RECEIVER_STATUS') {
-        if (message.containsKey('status') && message['status'] is Map<String, dynamic>) {
-          final status = message['status'] as Map<String, dynamic>;
-          if (status.containsKey('applications') && status['applications'] is List<dynamic>) {
-            final applications = status['applications'] as List<dynamic>;
-            for (final application in applications) {
-              if (application is Map<String, dynamic> && application.containsKey('appId') && application['appId'] == _appId) {
-                _appSessionId =application['sessionId'];
-                print('Found a new sessionId: ${_appSessionId}');
+      if (message.containsKey('type')) {
+        if (message['type'] == 'RECEIVER_STATUS') {
+          if (message.containsKey('status') && message['status'] is Map<String, dynamic>) {
+            final status = message['status'] as Map<String, dynamic>;
+            if (status.containsKey('applications') && status['applications'] is List<dynamic>) {
+              final applications = status['applications'] as List<dynamic>;
+              for (final application in applications) {
+                if (application is Map<String, dynamic> && application.containsKey('appId') && application['appId'] == _appId) {
+                  _appSessionId = application['sessionId'];
+                  print('Found a new sessionId: $_appSessionId');
+                }
               }
             }
           }
+        }
+        if (message['type'] == 'MEDIA_STATUS') {
+          int? mediaSessionId;
+          if (message.containsKey('status') && message['status'] is List<dynamic>) {
+            final statuses = message['status'] as List<dynamic>;
+            for (final status in statuses) {
+              if (status is Map<String, dynamic> && status.containsKey('mediaSessionId') && status['idleReason'] != 'CANCELLED') {
+                mediaSessionId = status['mediaSessionId'];
+                print('Found a new _mediaSessionId: $mediaSessionId');
+              }
+            }
+          }
+          _activeMediaSessionIdBS.add(mediaSessionId);
         }
       }
     });
@@ -73,6 +93,7 @@ class CastUiUtil {
       'type': 'LAUNCH',
       'appId': _appId,
     });
+
     return completer.future;
   }
 
@@ -83,7 +104,7 @@ class CastUiUtil {
     double currentTime = 0,
     String? subtitleUrl,
   }) async {
-    final session = await activeSession.first;
+    final session = await activeSessionStream.first;
     if (session == null) return;
     final message = {
       'contentId': url,
@@ -109,17 +130,69 @@ class CastUiUtil {
     });
   }
 
+  Future<void> pauseStream() async {
+    final session = await activeSessionStream.first;
+    if (session == null) return;
+    final mediaSessionId = await _activeMediaSessionIdBS.first;
+    if (mediaSessionId == null) return;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'PAUSE',
+      'requestId': Random().nextInt(974562),
+      'mediaSessionId': mediaSessionId,
+    });
+  }
+
+  Future<void> resumeStream() async {
+    final session = await activeSessionStream.first;
+    if (session == null) return;
+    final mediaSessionId = await _activeMediaSessionIdBS.first;
+    if (mediaSessionId == null) return;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'PLAY',
+      'requestId': Random().nextInt(974562),
+      'mediaSessionId': mediaSessionId,
+    });
+  }
+
+  Future<void> stopStream() async {
+    final session = await activeSessionStream.first;
+    if (session == null) return;
+    final mediaSessionId = await _activeMediaSessionIdBS.first;
+    if (mediaSessionId == null) return;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'STOP',
+      'requestId': Random().nextInt(974562),
+      'mediaSessionId': mediaSessionId,
+    });
+    _activeMediaSessionIdBS.add(null);
+  }
+
+  Future<void> seekStream() async {
+    final session = await activeSessionStream.first;
+    if (session == null) return;
+    final mediaSessionId = await _activeMediaSessionIdBS.first;
+    if (mediaSessionId == null) return;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'Seek',
+      'requestId': Random().nextInt(974562),
+      'mediaSessionId': mediaSessionId,
+    });
+  }
+
   Future<void> stopSession() async {
-    final session = await activeSession.first;
+    final session = await activeSessionStream.first;
     if (session == null) return;
     session.sendMessage(CastSession.kNamespaceReceiver, {
       'type': 'STOP',
       'sessionId': _appSessionId,
     });
+    await stopStream();
+    await Future.delayed(const Duration(seconds: 1));
     await CastSessionManager().endSession(session.sessionId);
     await _castSessionStateStream?.cancel();
     await _messageStream?.cancel();
-    _behaviorSubject.add(null);
+    _activeSessionBS.add(null);
+    _activeMediaSessionIdBS.add(null);
     _appSessionId = null;
   }
 }
