@@ -30,11 +30,12 @@ class CastUiUtil {
     session.stateStream.listen((state) {
       if (state == CastSessionState.connected) {
         if (completer.isCompleted) return;
+        _behaviorSubject.add(session);
         completer.complete(session);
       } else if (state == CastSessionState.connecting) {
         //todo loading
       } else if (state == CastSessionState.closed) {
-        //todo closed
+        _behaviorSubject.add(null);
       }
     });
 

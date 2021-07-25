@@ -26,12 +26,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   void initState() {
     super.initState();
     CastUiUtil().init('B6DF242C');
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,79 +44,93 @@ class _MyHomePageState extends State<MyHomePage> {
           ChromecastUiButton(),
         ],
       ),
-      body: ListView(
-        children: [
-          Stack(
+      body: StreamBuilder<bool>(
+        stream: CastUiUtil().hasActiveSession,
+        builder: (context, snapshot) {
+          final hasActiveCastConnection = snapshot.data ?? false;
+          return ListView(
             children: [
-              Image.network(
-                'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
-              ),
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => onClickVideo('http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4'),
-                  child: Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.play_arrow,
-                      size: 64,
-                      color: Colors.white,
+              Stack(
+                children: [
+                  Image.network(
+                    'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => onClickVideo(
+                        url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+                        hasActiveCastConnection: hasActiveCastConnection,
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.play_arrow,
+                          size: 64,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          Stack(
-            children: [
-              Image.network(
-                'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
-              ),
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => onClickVideo('https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4'),
-                  child: Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.play_arrow,
-                      size: 64,
-                      color: Colors.white,
+              Stack(
+                children: [
+                  Image.network(
+                    'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => onClickVideo(
+                        url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
+                        hasActiveCastConnection: hasActiveCastConnection,
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.play_arrow,
+                          size: 64,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-          Stack(
-            children: [
-              Image.network(
-                'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
-              ),
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () => onClickVideo('https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4'),
-                  child: Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.play_arrow,
-                      size: 64,
-                      color: Colors.white,
+              Stack(
+                children: [
+                  Image.network(
+                    'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => onClickVideo(
+                        url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
+                        hasActiveCastConnection: hasActiveCastConnection,
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.play_arrow,
+                          size: 64,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  void onClickVideo(String url) {
-    const isConnected = false;
-    if (isConnected) {
+  void onClickVideo({required String url, required bool hasActiveCastConnection}) {
+    if (hasActiveCastConnection) {
       print('Implement the cast implementation. And show the player');
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url)));
