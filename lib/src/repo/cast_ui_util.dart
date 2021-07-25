@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cast/cast.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:cast_ui/src/util/extensions/list_extensions.dart';
+import 'package:cast_ui/src/util/extensions/cast/cast_device_extensions.dart';
 
 class CastUiUtil {
   static CastUiUtil? _instance;
@@ -24,7 +26,11 @@ class CastUiUtil {
 
   Stream<bool> get hasActiveSession => activeSession.map((event) => event != null);
 
-  Future<List<CastDevice>> getCastDevices({Duration timeout = const Duration(seconds: 5)}) => CastDiscoveryService().search(timeout: timeout);
+  Future<List<CastDevice>> getCastDevices({Duration timeout = const Duration(seconds: 5)}) async {
+    final result = await CastDiscoveryService().search(timeout: timeout);
+    result.sortBy((item) => item.friendlyName.toLowerCase());
+    return result;
+  }
 
   Future<CastSession> startSession(CastDevice device) async {
     final completer = Completer<CastSession>();

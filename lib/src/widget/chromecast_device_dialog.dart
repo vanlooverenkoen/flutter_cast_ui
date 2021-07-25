@@ -1,4 +1,5 @@
 import 'package:cast_ui/src/viewmodel/chromecast_device_list_view_model.dart';
+import 'package:cast_ui/src/widget/chromecast_device_list_item.dart';
 import 'package:cast_ui/src/widget/chromecast_player.dart';
 import 'package:cast_ui/src/widget/provider/provider_widget.dart';
 import 'package:cast_ui/src/util/extensions/context_extensions.dart';
@@ -102,9 +103,9 @@ class _ChromecastDeviceDialogState extends State<ChromecastDeviceDialog> impleme
                           itemCount: viewModel.data.length,
                           itemBuilder: (context, index) {
                             final device = viewModel.data[index];
-                            return ListTile(
-                              title: Text(device.name),
-                              onTap: () => viewModel.onDeviceClicked(device),
+                            return ChromecastDeviceListItem(
+                              device: device,
+                              onClick: () => viewModel.onDeviceClicked(device),
                             );
                           },
                         ),
