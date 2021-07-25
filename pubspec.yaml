@@ -1,4 +1,4 @@
-name: flutter_cast_ui
+name: cast_ui
 description: A plugin that simplifies the cast plugin by providing a basic U
 version: 0.0.1
 
@@ -18,7 +18,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: be.vanlooveren.cast.ui.flutter_cast_ui
-        pluginClass: FlutterCastUiPlugin
+        package: be.vanlooveren.cast.ui
+        pluginClass: CastUiPlugin
       ios:
-        pluginClass: FlutterCastUiPlugin
+        pluginClass: CastUiPlugin

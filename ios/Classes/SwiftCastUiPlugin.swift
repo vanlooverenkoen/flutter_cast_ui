@@ -3,7 +3,7 @@ import UIKit
 
 public class SwiftFlutterCastUiPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_cast_ui", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "cast_ui", binaryMessenger: registrar.messenger())
     let instance = SwiftFlutterCastUiPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
