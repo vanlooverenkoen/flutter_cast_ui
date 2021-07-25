@@ -18,11 +18,15 @@ dev_dependencies:
     sdk: flutter
 
 dependency_overrides:
+  bonsoir:
+    git:
+      url: git@github.com:Skyost/Bonsoir.git
+      path: bonsoir
+      ref: master
   cast:
     git:
       url: git@github.com:vanlooverenkoen/flutter_cast.git
       ref: bugfix/bonsoir-master
-
 flutter:
   plugin:
     platforms:
