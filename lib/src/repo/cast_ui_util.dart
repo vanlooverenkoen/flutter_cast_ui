@@ -8,6 +8,8 @@ class CastUiUtil {
 
   late String _appId;
   late BehaviorSubject<CastSession?> _behaviorSubject;
+  StreamSubscription<CastSessionState?>? _castSessionStateStream;
+  StreamSubscription<Map<String, dynamic>?>? _messageStream;
 
   CastUiUtil._();
 
@@ -15,7 +17,7 @@ class CastUiUtil {
 
   Future<void> init(String appId) async {
     _appId = appId;
-    _behaviorSubject = BehaviorSubject<CastSession>();
+    _behaviorSubject = BehaviorSubject<CastSession?>();
   }
 
   Stream<CastSession?> get activeSession => _behaviorSubject.stream;
@@ -27,19 +29,22 @@ class CastUiUtil {
   Future<CastSession> startSession(CastDevice device) async {
     final completer = Completer<CastSession>();
     final session = await CastSessionManager().startSession(device);
-    session.stateStream.listen((state) {
+    await _castSessionStateStream?.cancel();
+    _castSessionStateStream = session.stateStream.listen((state) {
+      print(state);
       if (state == CastSessionState.connected) {
         if (completer.isCompleted) return;
         _behaviorSubject.add(session);
         completer.complete(session);
       } else if (state == CastSessionState.connecting) {
-        //todo loading
+        print('CONNECTING');
       } else if (state == CastSessionState.closed) {
         _behaviorSubject.add(null);
       }
     });
 
-    session.messageStream.listen((message) {
+    await _messageStream?.cancel();
+    _messageStream = session.messageStream.listen((message) {
       print('receive message: $message');
     });
 
@@ -48,5 +53,14 @@ class CastUiUtil {
       'appId': _appId,
     });
     return completer.future;
+  }
+
+  Future<void> stopSession() async {
+    final session = await activeSession.first;
+    if (session == null) return;
+    await CastSessionManager().endSession(session.sessionId);
+    await _castSessionStateStream?.cancel();
+    await _messageStream?.cancel();
+    _behaviorSubject.add(null);
   }
 }

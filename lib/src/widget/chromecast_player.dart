@@ -1,3 +1,5 @@
+import 'package:cast_ui/cast_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ChromecastPlayer extends StatelessWidget {
@@ -10,6 +12,10 @@ class ChromecastPlayer extends StatelessWidget {
         const Text('Player'),
         Expanded(
           child: Container(),
+        ),
+        MaterialButton(
+          onPressed: () => CastUiUtil().stopSession(),
+          child: Text('STOP SESSION'),
         ),
       ],
     );
