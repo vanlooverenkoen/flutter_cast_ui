@@ -1,6 +1,6 @@
 import 'dart:io';
 
-const packageName = 'model_generator';
+const packageName = 'cast_ui';
 
 main() {
   Logger.debug('====');
