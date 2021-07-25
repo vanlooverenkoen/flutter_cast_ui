@@ -50,77 +50,29 @@ class _MyHomePageState extends State<MyHomePage> {
           final hasActiveCastConnection = snapshot.data ?? false;
           return ListView(
             children: [
-              Stack(
-                children: [
-                  Image.network(
-                    'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => onClickVideo(
-                        url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-                        hasActiveCastConnection: hasActiveCastConnection,
-                      ),
-                      child: Container(
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.play_arrow,
-                          size: 64,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              VideoListItem(
+                onClick: () => onClickVideo(
+                  url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                imageUrl: 'https://lh3.googleusercontent.com/proxy/9TzV9kZS8MOWNEGHfW63ggra3GXsDipu57aqkbvWkYzDDy81cIebGDnqw5qxsHftlPAv_yNAvlZ5kgB6kG4aaVTebGYk4tAKHnBaBnfL0j_L028lXI2CwYk3IcQMW2d1',
+                hasActiveCastConnection: hasActiveCastConnection,
               ),
-              Stack(
-                children: [
-                  Image.network(
-                    'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => onClickVideo(
-                        url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
-                        hasActiveCastConnection: hasActiveCastConnection,
-                      ),
-                      child: Container(
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.play_arrow,
-                          size: 64,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              VideoListItem(
+                onClick: () => onClickVideo(
+                  url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                imageUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
+                hasActiveCastConnection: hasActiveCastConnection,
               ),
-              Stack(
-                children: [
-                  Image.network(
-                    'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => onClickVideo(
-                        url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
-                        hasActiveCastConnection: hasActiveCastConnection,
-                      ),
-                      child: Container(
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.play_arrow,
-                          size: 64,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              VideoListItem(
+                onClick: () => onClickVideo(
+                  url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
+                  hasActiveCastConnection: hasActiveCastConnection,
+                ),
+                imageUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
+                hasActiveCastConnection: hasActiveCastConnection,
               ),
             ],
           );
@@ -135,6 +87,42 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: url)));
     }
+  }
+}
+
+class VideoListItem extends StatelessWidget {
+  final VoidCallback onClick;
+  final String imageUrl;
+  final bool hasActiveCastConnection;
+
+  const VideoListItem({
+    required this.onClick,
+    required this.imageUrl,
+    required this.hasActiveCastConnection,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Image.network(imageUrl),
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: onClick,
+            child: Container(
+              color: Colors.transparent,
+              alignment: Alignment.center,
+              child: Icon(
+                hasActiveCastConnection ? Icons.cast_rounded : Icons.play_arrow,
+                size: 64,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
