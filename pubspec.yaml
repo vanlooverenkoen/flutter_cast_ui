@@ -7,12 +7,19 @@ environment:
   flutter: ">=1.20.0"
 
 dependencies:
+  cast: ^1.1.0
   flutter:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+dependency_overrides:
+  cast:
+    git:
+      url: git@github.com:vanlooverenkoen/flutter_cast.git
+      ref: bugfix/bonsoir-master
 
 flutter:
   plugin:
