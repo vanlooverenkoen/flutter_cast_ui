@@ -97,7 +97,12 @@ class CastUiUtil {
   Future<void> stopSession() async {
     final session = await activeSession.first;
     if (session == null) return;
-    await CastSessionManager().endSession(session.sessionId);
+    final sessionId = session.sessionId;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'STOP',
+      'sessionId': sessionId,
+    });
+    await CastSessionManager().endSession(sessionId);
     await _castSessionStateStream?.cancel();
     await _messageStream?.cancel();
     _behaviorSubject.add(null);
