@@ -75,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: 'Hot Air Balloons',
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
                   subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.vtt',
+                  subtitleContentType: 'text/vtt',
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
@@ -109,6 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: data.title,
         posterUrl: data.posterUrl,
         subtitleUrl: data.subtitleUrl,
+        subtitleContentType: data.subtitleContentType,
       );
     } else {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen(url: data.url, subtitleUrl: data.subtitleUrl)));

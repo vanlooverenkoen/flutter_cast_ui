@@ -130,7 +130,7 @@ class CastUiUtil {
             'subtype': 'SUBTITLES',
             'trackId': 1,
             'trackContentId': subtitleUrl,
-            'trackContentType': subtitleContentType ?? 'text/vtt',
+            'trackContentType': subtitleContentType,
           },
       ],
       'textTrackStyle': {
