@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
                 data: VideoListItemData(
-                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/big-buck-bunny.jpeg',
+                  posterUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/big-buck-bunny.jpeg',
                   title: 'Big Buck Bunny',
                   url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
                 ),
@@ -71,10 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
                 data: VideoListItemData(
-                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
+                  posterUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/hot-air-balloon.png',
                   title: 'Hot Air Balloons',
-                  url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
-                  subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.vtt',
+                  url: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/hot-air-balloon.mp4',
+                  subtitleUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/test.vtt',
                   subtitleContentType: 'text/vtt',
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
@@ -85,10 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
                 data: VideoListItemData(
-                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.png',
+                  posterUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/city.png',
                   title: 'City',
-                  url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
-                  subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.srt',
+                  url: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/city.mp4',
+                  subtitleUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/srt.vtt',
                   subtitleContentType: 'text/plain', //Not supported by chromecast
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
