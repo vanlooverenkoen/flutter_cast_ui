@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   posterUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/city.png',
                   title: 'City',
                   url: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/city.mp4',
-                  subtitleUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/srt.vtt',
+                  subtitleUrl: 'https://raw.githubusercontent.com/vanlooverenkoen/flutter_cast_ui/master/supporting-files/test.srt',
                   subtitleContentType: 'text/plain', //Not supported by chromecast
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
