@@ -187,10 +187,13 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
 
+  late final bool isValidSubtitleUrl;
+
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.url, closedCaptionFile: _getClosedCaptionFile(widget.subtitleUrl))
+    isValidSubtitleUrl = widget.subtitleUrl != null && widget.subtitleUrl?.endsWith('.srt') == true;
+    _controller = VideoPlayerController.network(widget.url, closedCaptionFile: isValidSubtitleUrl ? _getClosedCaptionFile(widget.subtitleUrl) : null)
       ..initialize().then((_) {
         _controller.play();
         setState(() {});
@@ -226,7 +229,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 child: Stack(
                   children: [
                     VideoPlayer(_controller),
-                    if (widget.subtitleUrl != null) ...[
+                    if (isValidSubtitleUrl) ...[
                       PlayerUpdater(
                         builder: (context) => ClosedCaption(
                           text: _controller.value.caption.text,
