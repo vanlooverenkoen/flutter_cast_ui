@@ -103,6 +103,7 @@ class CastUiUtil {
     required String posterUrl,
     double currentTime = 0,
     String? subtitleUrl,
+    String? subtitleContentType = 'text/vtt',
   }) async {
     final session = await activeSessionStream.first;
     if (session == null) return;
@@ -120,12 +121,34 @@ class CastUiUtil {
           }
         ],
       },
+      'tracks': [
+        if (subtitleUrl != null)
+          {
+            'language': 'en-US',
+            'name': 'English',
+            'type': 'TEXT',
+            'subtype': 'SUBTITLES',
+            'trackId': 1,
+            'trackContentId': subtitleUrl,
+            'trackContentType': subtitleContentType,
+          },
+      ],
+      'textTrackStyle': {
+        'backgroundColor': '#00000000',
+        'edgeType': 'OUTLINE',
+        'edgeColor': '#000000FF',
+        'fontScale': 1.1,
+      }
     };
 
     session.sendMessage(CastSession.kNamespaceMedia, {
       'type': 'LOAD',
       'autoPlay': true,
       'currentTime': currentTime,
+      if (subtitleUrl != null)
+        'activeTrackIds': [
+          1,
+        ],
       'media': message,
     });
   }

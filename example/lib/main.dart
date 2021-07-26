@@ -59,8 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   hasActiveCastConnection: hasActiveCastConnection,
                 ),
                 data: VideoListItemData(
-                  posterUrl:
-                      'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/big-buck-bunny.jpeg',
+                  posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/big-buck-bunny.jpeg',
                   title: 'Big Buck Bunny',
                   url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
                 ),
@@ -75,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   posterUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.png',
                   title: 'Hot Air Balloons',
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/hot-air-balloon.mp4',
+                  subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.vtt',
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
@@ -88,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: 'City',
                   url: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/city.mp4',
                   subtitleUrl: 'https://github.com/vanlooverenkoen/flutter_cast_ui/raw/master/supporting-files/test.srt',
+                  subtitleContentType: 'text/plain', //Not supported by chromecast
                 ),
                 hasActiveCastConnection: hasActiveCastConnection,
               ),
@@ -156,12 +157,14 @@ class VideoListItemData {
   final String posterUrl;
   final String url;
   final String? subtitleUrl;
+  final String? subtitleContentType;
 
   VideoListItemData({
     required this.title,
     required this.posterUrl,
     required this.url,
     this.subtitleUrl,
+    this.subtitleContentType,
   });
 }
 
