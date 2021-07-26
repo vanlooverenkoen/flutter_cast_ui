@@ -103,7 +103,7 @@ class CastUiUtil {
     required String posterUrl,
     double currentTime = 0,
     String? subtitleUrl,
-    String? subtitleContentType = 'text/vtt',
+    String? subtitleContentType,
   }) async {
     final session = await activeSessionStream.first;
     if (session == null) return;
@@ -130,7 +130,7 @@ class CastUiUtil {
             'subtype': 'SUBTITLES',
             'trackId': 1,
             'trackContentId': subtitleUrl,
-            'trackContentType': subtitleContentType,
+            'trackContentType': subtitleContentType ?? 'text/vtt',
           },
       ],
       'textTrackStyle': {
