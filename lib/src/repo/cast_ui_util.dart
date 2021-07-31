@@ -249,15 +249,15 @@ class CastUiUtil {
       'type': 'STOP',
       'sessionId': _appSessionId,
     });
-    // await stopStream();
-    // await Future.delayed(const Duration(seconds: 1));
-    // await CastSessionManager().endSession(session.sessionId);
-    // await _castSessionStateStream?.cancel();
-    // await _messageStream?.cancel();
-    // _activeSessionBS.add(null);
-    // _activeMediaSessionIdBS.add(null);
-    // _appSessionId = null;
-    // _lastActiveMedia = null;
-    // _lastActiveMediaDuration = null;
+    await stopStream();
+    await Future.delayed(const Duration(seconds: 1));
+    await CastSessionManager().endSession(session.sessionId);
+    await _castSessionStateStream?.cancel();
+    await _messageStream?.cancel();
+    _activeSessionBS.add(null);
+    _activeMediaSessionIdBS.add(null);
+    _appSessionId = null;
+    _lastActiveMedia = null;
+    _lastActiveMediaDuration = null;
   }
 }
