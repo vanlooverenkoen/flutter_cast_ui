@@ -73,7 +73,7 @@ class CastUiUtil {
       if (message['type'] == 'RECEIVER_STATUS') {
         final receiverStatus = ReceiverStatus.fromJson(message['status'] as Map<String, dynamic>);
         for (final application in receiverStatus.applications) {
-          if (application is Map<String, dynamic> && application.appId == _appId) {
+          if (application.appId == _appId) {
             _appSessionId = application.sessionId;
             print('Found a new sessionId: $_appSessionId');
           }
@@ -249,15 +249,15 @@ class CastUiUtil {
       'type': 'STOP',
       'sessionId': _appSessionId,
     });
-    await stopStream();
-    await Future.delayed(const Duration(seconds: 1));
-    await CastSessionManager().endSession(session.sessionId);
-    await _castSessionStateStream?.cancel();
-    await _messageStream?.cancel();
-    _activeSessionBS.add(null);
-    _activeMediaSessionIdBS.add(null);
-    _appSessionId = null;
-    _lastActiveMedia = null;
-    _lastActiveMediaDuration = null;
+    // await stopStream();
+    // await Future.delayed(const Duration(seconds: 1));
+    // await CastSessionManager().endSession(session.sessionId);
+    // await _castSessionStateStream?.cancel();
+    // await _messageStream?.cancel();
+    // _activeSessionBS.add(null);
+    // _activeMediaSessionIdBS.add(null);
+    // _appSessionId = null;
+    // _lastActiveMedia = null;
+    // _lastActiveMediaDuration = null;
   }
 }
