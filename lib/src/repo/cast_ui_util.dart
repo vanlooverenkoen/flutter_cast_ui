@@ -61,6 +61,8 @@ class CastUiUtil {
       } else if (state == CastSessionState.closed) {
         _activeSessionBS.add(null);
         _appSessionId = null;
+        _lastActiveMedia = null;
+        _lastActiveMediaDuration = null;
       }
     });
 
@@ -255,5 +257,7 @@ class CastUiUtil {
     _activeSessionBS.add(null);
     _activeMediaSessionIdBS.add(null);
     _appSessionId = null;
+    _lastActiveMedia = null;
+    _lastActiveMediaDuration = null;
   }
 }
