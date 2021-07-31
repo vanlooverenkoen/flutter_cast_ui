@@ -23,8 +23,7 @@ class MediaSessionStatus {
     required this.idleReason,
   });
 
-  factory MediaSessionStatus.fromJson(Map<String, dynamic> json) {
-    return MediaSessionStatus(
+  factory MediaSessionStatus.fromJson(Map<String, dynamic> json) => MediaSessionStatus(
         mediaSessionId: json['mediaSessionId'] as int,
         playbackRate: json['playbackRate'] as int,
         playerState: json['playerState'] as String,
@@ -35,7 +34,6 @@ class MediaSessionStatus {
         repeatMode: json['repeatMode'] as String?,
         idleReason: json['idleReason'] as String?,
       );
-  }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -53,4 +51,10 @@ class MediaSessionStatus {
   bool get isActive => playerState != 'IDLE';
 
   bool get isPlaying => playerState == 'PLAYING';
+
+  bool get isBuffering => playerState == 'BUFFERING';
+
+  bool get isPaused => playerState == 'PAUSED';
+
+  bool get isIdle => playerState == 'IDLE';
 }

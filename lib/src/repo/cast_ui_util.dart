@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:cast/cast.dart';
 import 'package:cast_ui/src/model/media_status/media.dart';
 import 'package:cast_ui/src/model/media_status/media_status.dart';
@@ -16,6 +14,7 @@ class CastUiUtil {
   String? _appSessionId;
   late BehaviorSubject<CastSession?> _activeSessionBS;
   Media? _lastActiveMedia;
+  double? _lastActiveMediaDuration;
   late BehaviorSubject<MediaSessionStatus?> _activeMediaSessionIdBS;
   StreamSubscription<CastSessionState?>? _castSessionStateStream;
   StreamSubscription<Map<String, dynamic>?>? _messageStream;
@@ -29,6 +28,8 @@ class CastUiUtil {
   Stream<bool> get hasActiveSessionStream => activeSessionStream.map((event) => event != null);
 
   Media? get lastActiveMedia => _lastActiveMedia;
+
+  double? get lastActiveMediaDuration => _lastActiveMediaDuration;
 
   CastUiUtil._();
 
@@ -85,6 +86,9 @@ class CastUiUtil {
         }
         if (mediaStatus?.media != null) {
           _lastActiveMedia = mediaStatus?.media;
+          if (mediaStatus?.media?.duration != null) {
+            _lastActiveMediaDuration = mediaStatus?.media?.duration;
+          }
         }
         _activeMediaSessionIdBS.add(mediaStatus);
       }
@@ -107,6 +111,7 @@ class CastUiUtil {
     String? subtitleContentType,
   }) async {
     _lastActiveMedia = null;
+    _lastActiveMediaDuration = null;
     final session = await activeSessionStream.first;
     if (session == null) return;
     final message = {
@@ -192,14 +197,45 @@ class CastUiUtil {
     _activeMediaSessionIdBS.add(null);
   }
 
-  Future<void> seekStream() async {
+  Future<void> seekStream(double currentTime) async {
+    final session = await activeSessionStream.first;
+    if (session == null) return;
+    final mediaSession = await activeMediaSessionStream.first;
+    if (mediaSession == null) return;
+    var actualTime = currentTime;
+    if (actualTime > (_lastActiveMediaDuration ?? 0)) {
+      actualTime = _lastActiveMediaDuration ?? 0;
+    } else if (actualTime < 0) {
+      actualTime = 0;
+    }
+    final mediaSessionId = mediaSession.mediaSessionId;
+    session.sendMessage(CastSession.kNamespaceMedia, {
+      'type': 'SEEK',
+      'mediaSessionId': mediaSessionId,
+      'currentTime': currentTime,
+    });
+  }
+
+  Future<void> scrubStreamBackwards({Duration duration = const Duration(seconds: 10)}) async {
+    final mediaSession = await activeMediaSessionStream.first;
+    if (mediaSession == null) return;
+    await seekStream(mediaSession.currentTime - duration.inSeconds);
+  }
+
+  Future<void> scrubStreamForward({Duration duration = const Duration(seconds: 10)}) async {
+    final mediaSession = await activeMediaSessionStream.first;
+    if (mediaSession == null) return;
+    await seekStream(mediaSession.currentTime + duration.inSeconds);
+  }
+
+  Future<void> getStatus() async {
     final session = await activeSessionStream.first;
     if (session == null) return;
     final mediaSession = await _activeMediaSessionIdBS.first;
     if (mediaSession == null) return;
     final mediaSessionId = mediaSession.mediaSessionId;
     session.sendMessage(CastSession.kNamespaceMedia, {
-      'type': 'Seek',
+      'type': 'GET_STATUS',
       'mediaSessionId': mediaSessionId,
     });
   }
